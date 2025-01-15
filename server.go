@@ -6,40 +6,23 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"strconv"
 	"sync/atomic"
 	"syscall"
 	"time"
-
-    "github.com/kuruteiru/gotodo"
 )
 
-const requestIDKey = 0
 var healthy int32
 
-func serve() {
-	logger := log.New(os.Stdout, "wacore: ", log.LstdFlags)
-	logger.Printf("start\n")
+func serve(router *http.Handler, logger *log.Logger) {
+    if logger == nil {
+        logger = log.New(os.Stdout, "wacore: ", log.LstdFlags)
+    }
 
-	http.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("hello\nworld!\n"))
-	})
-
-	http.HandleFunc("GET /healtz", func(w http.ResponseWriter, r *http.Request) {
-		if atomic.LoadInt32(&healthy) == 1 {
-			w.WriteHeader(http.StatusNoContent)
-			return
-		}
-		w.WriteHeader(http.StatusServiceUnavailable)
-	})
-
-	nextRequestID := func() string {
-		return strconv.FormatInt(time.Now().UnixNano(), 10)
-	}
+	logger.Printf("server start\n")
 
 	server := &http.Server{
 		Addr:         ":8080",
-		Handler:      tracing(nextRequestID)(logging(logger)(http.DefaultServeMux)),
+		Handler:      *router,
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  15 * time.Second,
@@ -72,5 +55,5 @@ func serve() {
 	}
 
 	<-done
-	logger.Printf("server is shutdown\n")
+	logger.Printf("server shutdown\n")
 }
