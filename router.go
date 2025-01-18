@@ -3,6 +3,7 @@ package main
 import (
     "net/http"
     "sync/atomic"
+    "github.com/kuruteiru/gotodo/models"
 )
 
 func route() http.Handler {
@@ -19,6 +20,8 @@ func route() http.Handler {
 		}
 		w.WriteHeader(http.StatusServiceUnavailable)
 	})
+
+    router.HandleFunc("GET /todolist", models.ViewTodolist)
 
     return router
 }
