@@ -5,7 +5,7 @@ import (
     "os"
 )
 
-func main() {
+func initServer() {
     logger := log.New(os.Stdout, "gotodo: ", log.LstdFlags)
 
     router := route()
@@ -13,4 +13,9 @@ func main() {
     router = tracing(nextRequestID)(router)
 
     serve(&router, logger)
+}
+
+func main() {
+    initServer()
+    os.Exit(0)
 }
