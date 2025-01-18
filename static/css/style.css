@@ -1,0 +1,11 @@
+* {
+    color: blue;
+}
+
+.task {
+    color: red;
+}
+
+.task-completed {
+    color: green;
+}
