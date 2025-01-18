@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{{.Title}}</title>
+        <link rel="stylesheet" href="../static/css/style.css"> 
+    </head>
+    <body>
+        <header>
+            <h1>gotodo</h1>
+            <nav>
+                <ul>
+                    <li>home</li>
+                    <li>todolist</li>
+                    <li>create task</li>
+                </ul>
+            </nav>
+        </header>
+        <main>
+            {{block "content" .}}
+            <h1>sorry, no content for this page</h1>
+            {{end}}
+        </main>
+        <footer><p>&copy; 2025 gotodo<p></footer>
+    </body>
+</html>
