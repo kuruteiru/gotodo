@@ -1,0 +1,14 @@
+{{define "content"}}
+<h1>todo: {{.Title}}</h1>
+<ul>
+    {{range $task := .Tasks}}
+    <li class="task">
+        <span>ID: {{$task.ID}}</span>
+        <span>Name: {{$task.Name}}</span>
+        <span>Description: {{$task.Description}}</span>
+        <span>Created: {{$task.Created}}</span>
+        <span>Completed: {{$task.Completed}}</span>
+    </li>
+    {{end}}
+</ul>
+{{end}}
