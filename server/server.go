@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"context"
@@ -11,9 +11,9 @@ import (
 	"time"
 )
 
-var healthy int32
+var Healthy int32
 
-func serve(router *http.Handler, logger *log.Logger) {
+func Serve(router *http.Handler, logger *log.Logger) {
     if logger == nil {
         logger = log.New(os.Stdout, "wacore: ", log.LstdFlags)
     }
@@ -32,11 +32,11 @@ func serve(router *http.Handler, logger *log.Logger) {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 
-	atomic.StoreInt32(&healthy, 1)
+	atomic.StoreInt32(&Healthy, 1)
 	go func() {
 		<-quit
 		logger.Printf("server is shutting down...\n")
-		atomic.StoreInt32(&healthy, 0)
+		atomic.StoreInt32(&Healthy, 0)
 
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()

@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
     "log"
@@ -10,11 +10,11 @@ import (
 
 const requestIDKey = 0
 
-func nextRequestID() string {
+func NextRequestID() string {
     return strconv.FormatInt(time.Now().UnixNano(), 10)
 }
 
-func tracing(nextRequestID func() string) func(http.Handler) http.Handler {
+func Tracing(nextRequestID func() string) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			requestID := r.Header.Get("X-Request-Id")
@@ -28,7 +28,7 @@ func tracing(nextRequestID func() string) func(http.Handler) http.Handler {
 	}
 }
 
-func logging(logger *log.Logger) func(http.Handler) http.Handler {
+func Logging(logger *log.Logger) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			defer func() {

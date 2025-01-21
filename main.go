@@ -1,18 +1,21 @@
 package main
 
 import (
-    "log"
-    "os"
+	"log"
+	"os"
+
+	"github.com/kuruteiru/gotodo/router"
+	"github.com/kuruteiru/gotodo/server"
 )
 
 func initServer() {
     logger := log.New(os.Stdout, "gotodo: ", log.LstdFlags)
 
-    router := route()
-    router = logging(logger)(router)
-    router = tracing(nextRequestID)(router)
+    r := router.Route()
+    r = server.Logging(logger)(r)
+    r = server.Tracing(server.NextRequestID)(r)
 
-    serve(&router, logger)
+    server.Serve(&r, logger)
 }
 
 func main() {
