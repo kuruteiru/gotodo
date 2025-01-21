@@ -1,20 +1,15 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
-	"strings"
     "github.com/kuruteiru/gotodo/models"
+    "github.com/kuruteiru/gotodo/renderer"
 )
 
 func ViewTodolist(w http.ResponseWriter, r *http.Request) {
-    tasks := models.GenerateTasks()
-    // PrintTasks(tasks)
-
-    var sb strings.Builder
-    for i, task := range tasks {
-        fmt.Fprintf(&sb, "%v: %+v\n", i, task)
-    }
-
-    fmt.Fprintf(w, "%v", sb.String())
+    renderer.RenderTemplate(w, "todolist", struct {
+        Tasks []models.Task
+    }{
+        Tasks: models.GenerateTasks(),
+    })
 }
