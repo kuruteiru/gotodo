@@ -26,7 +26,7 @@ func (tp *TaskPriority) String() string {
 }
 
 type Task struct {
-    Id          uint
+    ID          uint
     Name        string
     Description string
     Priority    TaskPriority
@@ -36,7 +36,7 @@ type Task struct {
 
 func NewTask(id uint, name string, description string, priority TaskPriority) Task {
     return Task{
-        Id:          id,
+        ID:          id,
         Name:        name,
         Description: description,
         Priority:    priority,
@@ -55,7 +55,7 @@ func GenerateTasks() []Task {
 
     for i := range count {
         tasks = append(tasks, Task{
-            Id: uint(i),
+            ID: uint(i),
             Name: fmt.Sprintf("task %v", uint(i)),
             Description: fmt.Sprintf("task desc %v", uint(i)),
             Created: time.Now().UTC(),
