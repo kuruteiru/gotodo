@@ -45,7 +45,7 @@ func NewTask(id uint, name string, description string, priority TaskPriority) Ta
 }
 
 func (t *Task) Complete() {
-    now := time.Now()
+    now := time.Now().UTC()
     t.Completed = &now
 }
 
@@ -58,19 +58,19 @@ func GenerateTasks() []Task {
             Id: uint(i),
             Name: fmt.Sprintf("task %v", uint(i)),
             Description: fmt.Sprintf("task desc %v", uint(i)),
-            Created: time.Now().UTC().Truncate(time.Second),
+            Created: time.Now().UTC(),
             Priority: TaskPriorityNone,
         })
     }
 
-    <-time.After(3 * time.Second)
-    tasks[2].Complete()
-    <-time.After(1 * time.Second)
-    tasks[3].Complete()
-    <-time.After(2 * time.Second)
-    tasks[7].Complete()
-    <-time.After(1 * time.Second)
-    tasks[9].Complete()
+    // <-time.After(3 * time.Second)
+    // tasks[2].Complete()
+    // <-time.After(1 * time.Second)
+    // tasks[3].Complete()
+    // <-time.After(2 * time.Second)
+    // tasks[7].Complete()
+    // <-time.After(1 * time.Second)
+    // tasks[9].Complete()
 
     return tasks
 }
