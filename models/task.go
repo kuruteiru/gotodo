@@ -1,9 +1,8 @@
 package models
 
 import (
-    "fmt"
-    "time"
-    "net/http"
+	"fmt"
+	"time"
 )
 
 type TaskPriority uint8
@@ -45,32 +44,16 @@ func NewTask(id uint, name string, description string, priority TaskPriority) Ta
     }
 }
 
-func (t *Task) Delete() error {
-    return nil
-}
-
-func (t *Task) Update() error {
-    return nil
-}
-
 func (t *Task) Complete() {
     now := time.Now()
     t.Completed = &now
-}
-
-func GetTask(id uint) Task {
-    return Task{}
-}
-
-func GetTasks() []Task {
-    return []Task{}
 }
 
 func GenerateTasks() []Task {
     count := 10
     tasks := []Task{}
 
-    for i := 0; i < count; i++ {
+    for i := range count {
         tasks = append(tasks, Task{
             Id: uint(i),
             Name: fmt.Sprintf("task %v", uint(i)),
@@ -78,14 +61,11 @@ func GenerateTasks() []Task {
             Created: time.Now().UTC().Truncate(time.Second),
             Priority: TaskPriorityNone,
         })
-        fmt.Printf("%+v\n", tasks[i])
-        fmt.Printf("task created: %v\n", tasks[i].Created)
-        fmt.Printf("task priority: %v = %v\n\n", tasks[i].Priority, tasks[i].Priority.String())
     }
 
     <-time.After(3 * time.Second)
     tasks[2].Complete()
-    <-time.After(4 * time.Second)
+    <-time.After(1 * time.Second)
     tasks[3].Complete()
     <-time.After(2 * time.Second)
     tasks[7].Complete()
@@ -95,6 +75,8 @@ func GenerateTasks() []Task {
     return tasks
 }
 
-func ViewTodolist(w http.ResponseWriter, r *http.Request) {
-    tasks := GenerateTasks()
+func PrintTasks(tasks []Task) {
+    for i, task := range tasks {
+        fmt.Printf("%v: %+v\n", i, task)
+    }
 }
