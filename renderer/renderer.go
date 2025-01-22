@@ -1,6 +1,7 @@
 package renderer
 
 import (
+	"errors"
 	"fmt"
 	"html/template"
 	"io"
@@ -9,6 +10,9 @@ import (
 
 const (
 	templatesDir = "views"
+	defaultTitle = "gotodo"
+	baseTemplate = "base"
+	noContentTemplate = "nocontent"
 )
 
 type PageData struct {
@@ -16,28 +20,40 @@ type PageData struct {
 	Data  any
 }
 
-func NewPageData(title string, data any) PageData {
-	return PageData{
-		Title: title,
-		Data:  data,
-	}
-}
-
-func RenderTemplate(writer io.Writer, name string, data any) error {
+func RenderTemplate(writer io.Writer, name string, data *PageData) error {
 	t := loadTemplate(name)
-	return t.Execute(writer, PageData{
-		Title: name,
-		Data:  data,
-	})
+	if t == nil {
+		return errors.New("No templates to render")
+	}
+
+	if data == nil {
+		data = &PageData{
+			Title: defaultTitle,
+			Data:  nil,
+		}
+	}
+
+	return t.Execute(writer, data)
 }
 
 func loadTemplate(name string) *template.Template {
-	base := fmt.Sprintf("%s/base.html", templatesDir)
+	base := fmt.Sprintf("%s/%s.html", templatesDir, baseTemplate)
 	name = fmt.Sprintf("%s/%s.html", templatesDir, name)
 
-	t, err := template.ParseFiles(base, name)
+	b, err := template.ParseFiles(base)
 	if err != nil {
-		fmt.Printf("couldn't load template: %v\n%v\n", name, err.Error())
+		return nil
+	}
+
+	t, err := b.ParseFiles(name)
+	if err == nil {
+		return t
+	}
+
+	name = fmt.Sprintf("%s/%s.html", templatesDir, noContentTemplate)
+	t, err = b.ParseFiles(name)
+	if err != nil {
+		return nil
 	}
 
 	return t

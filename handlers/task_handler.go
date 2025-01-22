@@ -8,7 +8,11 @@ import (
 )
 
 func ViewTodolist(w http.ResponseWriter, r *http.Request) {
-	renderer.RenderTemplate(w, "todolist", map[string][]models.Task{
-		"Tasks": models.GenerateTasks(),
-	})
+	pd := &renderer.PageData{
+		Title: "todolist",
+		Data: map[string][]models.Task{
+			"Tasks": models.GenerateTasks(),
+		},
+	}
+	renderer.RenderTemplate(w, "todolist", pd)
 }

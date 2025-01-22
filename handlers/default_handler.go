@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 	"sync/atomic"
 
@@ -9,8 +8,14 @@ import (
 	"github.com/kuruteiru/gotodo/server"
 )
 
-func ViewWrongPage(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "wrong page")
+
+func ViewPage(w http.ResponseWriter, r *http.Request) {
+	p := r.PathValue("page")
+	renderer.RenderTemplate(w, p, nil)
+}
+
+func ViewNoContent(w http.ResponseWriter, r *http.Request) {
+	renderer.RenderTemplate(w, "nocontent", nil)
 }
 
 func ViewIndex(w http.ResponseWriter, r *http.Request) {

@@ -12,8 +12,10 @@ func Route() http.Handler {
 	fs := http.FileServer(http.Dir("static/"))
 	router.Handle("GET /static/", http.StripPrefix("/static/", fs))
 
-	router.HandleFunc("GET /", handlers.ViewWrongPage)
+	router.HandleFunc("GET /", handlers.ViewNoContent)
 	router.HandleFunc("GET /{$}", handlers.ViewIndex)
+	router.HandleFunc("GET /{page}", handlers.ViewPage)
+
 	router.HandleFunc("GET /healtz", handlers.ViewHealtz)
 	router.HandleFunc("GET /todolist", handlers.ViewTodolist)
 
