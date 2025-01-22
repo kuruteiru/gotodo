@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>{{.Title}}</title>
         <link rel="stylesheet" href="/static/css/main.css"> 
+		{{block "scripts" .}}{{end}}
     </head>
     <body>
         <header>
@@ -19,7 +20,7 @@
         </header>
         <main>
             {{block "content" .Data}}
-            <h1>sorry, no content for this page</h1>
+				<h1>sorry, no content for this page</h1>
             {{end}}
         </main>
         <footer><p>&copy; 2025 gotodo<p></footer>
