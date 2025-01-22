@@ -14,9 +14,9 @@ import (
 var Healthy int32
 
 func Serve(router *http.Handler, logger *log.Logger) {
-    if logger == nil {
-        logger = log.New(os.Stdout, "wacore: ", log.LstdFlags)
-    }
+	if logger == nil {
+		logger = log.New(os.Stdout, "wacore: ", log.LstdFlags)
+	}
 
 	logger.Printf("server start\n")
 

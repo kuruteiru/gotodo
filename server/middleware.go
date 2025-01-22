@@ -1,17 +1,17 @@
 package server
 
 import (
-    "log"
-    "net/http"
-    "context"
-    "strconv"
-    "time"
+	"context"
+	"log"
+	"net/http"
+	"strconv"
+	"time"
 )
 
 const requestIDKey = 0
 
 func NextRequestID() string {
-    return strconv.FormatInt(time.Now().UnixNano(), 10)
+	return strconv.FormatInt(time.Now().UnixNano(), 10)
 }
 
 func Tracing(nextRequestID func() string) func(http.Handler) http.Handler {

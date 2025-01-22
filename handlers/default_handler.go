@@ -10,17 +10,17 @@ import (
 )
 
 func ViewWrongPage(w http.ResponseWriter, r *http.Request) {
-    fmt.Fprintf(w, "wrong page")
+	fmt.Fprintf(w, "wrong page")
 }
 
 func ViewIndex(w http.ResponseWriter, r *http.Request) {
-    renderer.RenderTemplate(w, "index", nil)
+	renderer.RenderTemplate(w, "index", nil)
 }
 
 func ViewHealtz(w http.ResponseWriter, r *http.Request) {
-    if atomic.LoadInt32(&server.Healthy) == 1 {
-        w.WriteHeader(http.StatusNoContent)
-        return
-    }
-    w.WriteHeader(http.StatusServiceUnavailable)
+	if atomic.LoadInt32(&server.Healthy) == 1 {
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
+	w.WriteHeader(http.StatusServiceUnavailable)
 }
