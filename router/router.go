@@ -19,5 +19,8 @@ func Route() http.Handler {
 	router.HandleFunc("GET /healtz", handlers.ViewHealtz)
 	router.HandleFunc("GET /todolist", handlers.ViewTodolist)
 
+	router.HandleFunc("GET /task/{page}", handlers.ViewTask)
+	router.HandleFunc("POST /task/create", handlers.CreateTask)
+
 	return router
 }
