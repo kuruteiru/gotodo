@@ -1,9 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
 
 :root {
-	--bg: black;
-	--fg: white;
-	--mbg: #872341;
+	--bg0: black;
+	--bg1: #04040a;
+	--bg2: #1F1E33;
+	--fg0: white;
+	--fg1: #C9CDD6;
+	--fg2: #E5E4E2;
 	--hh: 4rem;
 	--fh: 2.5rem;
 }
@@ -15,8 +18,8 @@
 }
 
 html {
-	background-color: var(--bg);
-	color: var(--fg);
+	background-color: var(--bg0);
+	color: var(--fg2);
 }
 
 body {
@@ -30,7 +33,7 @@ header {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	border-bottom: 1px white solid;
+	border-bottom: var(--bg2) 1px solid;
 }
 
 header nav ul {
@@ -45,7 +48,7 @@ header nav ul li {
 
 header nav ul li a {
 	text-decoration: none;
-	color: var(--fg)
+	color: var(--fg2)
 }
 
 footer {
@@ -55,11 +58,11 @@ footer {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	border-top: 1px white solid;
+	border-top: var(--bg2) 1px solid;
 }
 
 main {
 	min-height: calc(100vh - var(--fh) - var(--hh));
-	background-color: var(--mbg) !important;
+	background-color: var(--bg1) !important;
 	padding: 1rem 20%;
 }
