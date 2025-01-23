@@ -1,7 +1,23 @@
-.task {
-    color: red;
+form {
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
-.task-completed {
-    color: green;
+form fieldset {
+	width: 50%;
+	display: flex;
+	justify-content: center;
+	flex-direction: column;
+	gap: 1rem2;
+}
+
+textarea {
+	resize: vertical;
+}
+
+.form-field {
+	display: flex;
+	flex-direction: column;
+	gap: .5rem;
 }
