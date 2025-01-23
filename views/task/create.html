@@ -1,0 +1,35 @@
+{{define "content"}}
+<form name="taskCreate" method="post" target="_blank">
+	<fieldset>
+		<legend>create task</legend>
+
+		<div class="form-field">
+			<label for="name">name</label>
+			<input type="text" id="name" name="name" placeholder="name">
+		</div>
+
+		<div class="form-field">
+			<label for="description">description</label>
+			<textarea id="description" name="description" placeholder="description" rows="4" cols="30"></textarea>
+		</div>
+
+		<div class="form-field">
+			<label for="priority">priority</label>
+			<select id="priority" name="priority" placeholder="none">
+				<option value="0" selected>select priority</option>
+				<option value="1">low</option>
+				<option value="2">medium</option>
+				<option value="3">high</option>
+			</select>
+		</div>
+
+		<div>
+			<input type="submit" name="submit" value="create">
+		</div>
+	</fieldset>
+</form>
+{{end}}
+
+{{define "css"}}
+<link rel="stylesheet" type="text/css" href="/static/css/task.css">
+{{end}}
