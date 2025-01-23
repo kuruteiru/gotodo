@@ -1,28 +1,37 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>{{.Title}}</title>
-        <link rel="stylesheet" href="/static/css/main.css"> 
-		{{block "scripts" .}}{{end}}
-    </head>
-    <body>
-        <header>
-            <h1>gotodo</h1>
-            <nav>
-                <ul>
-                    <li><a href="/">home</a></li>
-                    <li><a href="/todolist">todolist</a></li>
-                    <li><a href="/create/task">create task</a></li>
-                </ul>
-            </nav>
-        </header>
-        <main>
-            {{block "content" .Data}}
-				<h1>sorry, no content for this page</h1>
-            {{end}}
-        </main>
-        <footer><p>&copy; 2025 gotodo<p></footer>
-    </body>
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>{{.Title}}</title>
+	<link rel="icon" type="image/x-icon" href="/static/images/favicon.ico">
+	<link rel="stylesheet" type="text/css" href="/static/css/main.css">
+	{{block "css" .}}{{end}}
+	<script type="text/javascript" src="/static/js/main.js" defer></script>
+	{{block "js" .}}{{end}}
+</head>
+
+<body>
+	<header>
+		<h1>gotodo</h1>
+		<nav>
+			<ul>
+				<li><a href="/">home</a></li>
+				<li><a href="/todolist">todolist</a></li>
+				<li><a href="/create/task">create task</a></li>
+			</ul>
+		</nav>
+	</header>
+	<main>
+		{{block "content" .Data}}
+		<h1>sorry, no content for this page</h1>
+		{{end}}
+	</main>
+	<footer>
+		<p>&copy; 2025 gotodo
+		<p>
+	</footer>
+</body>
+
 </html>
