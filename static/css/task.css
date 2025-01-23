@@ -9,7 +9,7 @@ form fieldset {
 	display: flex;
 	justify-content: center;
 	flex-direction: column;
-	gap: 1rem2;
+	gap: 1rem;
 }
 
 textarea {
