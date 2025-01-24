@@ -5,6 +5,10 @@ import (
 	"time"
 )
 
+var (
+	currentTaskID uint64 = 0
+)
+
 type TaskPriority uint8
 
 const (
@@ -15,7 +19,7 @@ const (
 )
 
 var taskPriorityString = map[TaskPriority]string{
-	TaskPriorityNone:	"none",
+	TaskPriorityNone:   "none",
 	TaskPriorityLow:    "low",
 	TaskPriorityMedium: "medium",
 	TaskPriorityHigh:   "high",
@@ -26,7 +30,7 @@ func (tp *TaskPriority) String() string {
 }
 
 type Task struct {
-	ID          uint
+	ID          uint64
 	Name        string
 	Description string
 	Priority    TaskPriority
@@ -34,13 +38,13 @@ type Task struct {
 	Completed   *time.Time
 }
 
-func NewTask(id uint, name string, description string, priority TaskPriority) Task {
+func NewTask(id uint64, name string, description string, priority TaskPriority) Task {
 	return Task{
 		ID:          id,
 		Name:        name,
 		Description: description,
 		Priority:    priority,
-		Created:     time.Now(),
+		Created:     time.Now().UTC(),
 	}
 }
 
@@ -49,13 +53,17 @@ func (t *Task) Complete() {
 	t.Completed = &now
 }
 
+func NextTaskID() uint64 {
+	return currentTaskID + 1
+}
+
 func GenerateTasks() []Task {
 	count := 10
 	tasks := []Task{}
 
 	for i := range count {
 		tasks = append(tasks, Task{
-			ID:          uint(i),
+			ID:          uint64(i),
 			Name:        fmt.Sprintf("task %v", uint(i)),
 			Description: fmt.Sprintf("task desc %v", uint(i)),
 			Created:     time.Now().UTC(),
