@@ -1,0 +1,19 @@
+{{define "content"}}
+{{$task := .Task}}
+<h1>task:</h1>
+<section>
+	<ul>
+		<li class="task">
+			<span>ID: {{$task.ID}}</span>
+			<span>Name: {{$task.Name}}</span>
+			<span>Description: {{$task.Description}}</span>
+			<span>Created: {{$task.Created}}</span>
+			<span>Completed: {{$task.Completed}}</span>
+		</li>
+	</ul>
+</section>
+{{end}}
+
+{{define "css"}}
+<link rel="stylesheet" type="text/css" href="/static/css/task.css">
+{{end}}
