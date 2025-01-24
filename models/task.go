@@ -38,14 +38,16 @@ type Task struct {
 	Completed   *time.Time
 }
 
-func NewTask(id uint64, name string, description string, priority TaskPriority) Task {
-	return Task{
-		ID:          id,
+func NewTask(name string, description string, priority TaskPriority) Task {
+	t := Task{
+		ID:          currentTaskID,
 		Name:        name,
 		Description: description,
 		Priority:    priority,
 		Created:     time.Now().UTC(),
 	}
+	currentTaskID++
+	return t
 }
 
 func (t *Task) Complete() {
@@ -53,14 +55,14 @@ func (t *Task) Complete() {
 	t.Completed = &now
 }
 
-func NextTaskID() uint64 {
-	return currentTaskID + 1
+func GetTask(id uint64) *Task {
+	t := &GenerateTasks(1)[0]
+	t.ID = id
+	return t
 }
 
-func GenerateTasks() []Task {
-	count := 10
+func GenerateTasks(count int) []Task {
 	tasks := []Task{}
-
 	for i := range count {
 		tasks = append(tasks, Task{
 			ID:          uint64(i),
@@ -70,16 +72,6 @@ func GenerateTasks() []Task {
 			Priority:    TaskPriorityNone,
 		})
 	}
-
-	// <-time.After(3 * time.Second)
-	// tasks[2].Complete()
-	// <-time.After(1 * time.Second)
-	// tasks[3].Complete()
-	// <-time.After(2 * time.Second)
-	// tasks[7].Complete()
-	// <-time.After(1 * time.Second)
-	// tasks[9].Complete()
-
 	return tasks
 }
 
