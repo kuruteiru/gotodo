@@ -2,6 +2,8 @@ package models
 
 import (
 	"fmt"
+	"os"
+	"text/tabwriter"
 	"time"
 )
 
@@ -78,5 +80,21 @@ func GenerateTasks(count int) []Task {
 func PrintTasks(tasks []Task) {
 	for i, task := range tasks {
 		fmt.Printf("%v: %+v\n", i, task)
+	}
+}
+
+func PrintTasksTable(tasks []Task) {
+	w := tabwriter.NewWriter(os.Stdout, 0, 4, 2, ' ', tabwriter.TabIndent)
+	defer w.Flush()
+
+	fmt.Fprintf(w, "id\tname\tdescription\tpriority\tcreated\tcompleted\t\n")
+	for _, t := range tasks {
+		completed := "false"
+		if t.Completed != nil {
+			completed = t.Completed.Format(time.DateTime)
+		}
+
+		fmt.Fprintf(w, "%v\t%v\t%v\t%v\t%v\t%v\t\n", t.ID, t.Name, t.Description,
+			t.Priority.String(), t.Created.Format(time.DateTime), completed)
 	}
 }
