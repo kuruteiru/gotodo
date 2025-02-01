@@ -108,6 +108,10 @@ func WriteTasks(id uint64, tasks []models.Task) error {
 		}
 	}
 
+	if errs != nil {
+		return fmt.Errorf("couldn't write records: [%w]", errors.Join(errs...))
+	}
+
 	return nil
 }
 
