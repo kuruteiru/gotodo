@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"reflect"
 	"strconv"
 	"sync"
 	"time"
@@ -12,30 +13,22 @@ import (
 	"github.com/kuruteiru/gotodo/models"
 )
 
-var mutex sync.RWMutex
+var mutexes = sync.Map{}
 
-func Main() {
-	t, err := ReadTasks(1)
-	if err != nil {
-		fmt.Printf("errr1: %v\n", err.Error())
-	}
-	models.PrintTasksTable(t)
-	fmt.Println()
-
-	// if err := WriteTasks(1, models.GenerateTasks(5)); err != nil {
-	// 	fmt.Printf("errw: %v\n", err.Error())
-	// }
-	//
-	// t, err = ReadTasks(1)
-	// if err != nil {
-	// 	fmt.Printf("errr2: %v\n", err.Error())
-	// }
-	// models.PrintTasksTable(t)
+func getMutex(id uint64) *sync.RWMutex {
+	mutex, _ := mutexes.LoadOrStore(id, &sync.RWMutex{})
+	return mutex.(*sync.RWMutex)
 }
+
+func GetTask(id uint64) {}
+func UpdateTask(id uint64) {}
+func SaveTask(id uint64) {}
+func DeleteTask(id uint64) {}
 
 func ReadTasks(id uint64) ([]models.Task, error) {
 	path := fmt.Sprintf("db/tasks/%v.csv", id)
 
+	mutex := getMutex(id)
 	mutex.RLock()
 	defer mutex.RUnlock()
 
@@ -51,6 +44,14 @@ func ReadTasks(id uint64) ([]models.Task, error) {
 		return nil, fmt.Errorf("failed reading csv file %s: %w", path, err)
 	}
 
+	if len(records) == 0 || len(records[0]) != reflect.TypeOf(models.Task{}).NumField() {
+		return nil, fmt.Errorf("invalid header count")
+	}
+
+	if len(records) == 1 {
+		return nil, fmt.Errorf("no tasks in %s", path)
+	}
+
 	var tasks []models.Task
 	var errs []error
 
@@ -61,7 +62,7 @@ func ReadTasks(id uint64) ([]models.Task, error) {
 
 		task, err := parseTask(record)
 		if err != nil {
-			errs = append(errs, fmt.Errorf("can't read record %v: [%w]", i, err))
+			errs = append(errs, fmt.Errorf("failed reading record %v: [%w]", i, err))
 			continue
 		}
 
@@ -73,9 +74,9 @@ func ReadTasks(id uint64) ([]models.Task, error) {
 	}
 
 	if len(tasks) == 0 {
-		return nil, errors.New("no valid tasks found")
+		return nil, fmt.Errorf("no valid tasks found")
 	}
-	
+
 	if errs != nil {
 		return tasks, fmt.Errorf("invalid records: [%w]", errors.Join(errs...))
 	}
@@ -83,40 +84,64 @@ func ReadTasks(id uint64) ([]models.Task, error) {
 	return tasks, nil
 }
 
-//todo: write into tmp file instead
 func WriteTasks(id uint64, tasks []models.Task) error {
 	path := fmt.Sprintf("db/tasks/%v.csv", id)
+	tmp := path + ".tmp"
 
+	mutex := getMutex(id)
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	f, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	old, err := os.Open(path)
 	if err != nil {
 		return fmt.Errorf("failed to open file %s: %w", path, err)
 
 	}
-	defer f.Close()
+	defer old.Close()
 
+	f, err := os.Create(tmp)
+	if err != nil {
+		return fmt.Errorf("failed to open file %s: %w", path, err)
+	}
+	defer func() {
+		f.Close()
+		os.Remove(tmp)
+	}()
+
+	r := csv.NewReader(old)
 	w := csv.NewWriter(f)
-	defer w.Flush()
 
-	var errs []error
-	for i, t := range tasks {
-		if err := w.Write(formatTask(t)); err != nil {
-			errs = append(errs, fmt.Errorf("couldn't write record %v: [%w]", i, err))
-			continue
+	oldTasks, err := r.ReadAll()
+	if err != nil {
+		return fmt.Errorf("failed reading csv file %s: %w", path, err)
+	}
+
+	for i, t := range oldTasks {
+		if err := w.Write(t); err != nil {
+			return fmt.Errorf("failed copying old record %v: [%w]", i, err)
 		}
 	}
 
-	if errs != nil {
-		return fmt.Errorf("couldn't write records: [%w]", errors.Join(errs...))
+	for i, t := range tasks {
+		if err := w.Write(formatTask(t)); err != nil {
+			return fmt.Errorf("failed writing record %v: [%w]", i, err)
+		}
+	}
+
+	w.Flush()
+	if err := w.Error(); err != nil {
+		return fmt.Errorf("failed flushing: [%w]", err)
+	}
+
+	if err := os.Rename(tmp, path); err != nil {
+		return fmt.Errorf("failed swapping tmp file %v: [%w]", tmp, err)
 	}
 
 	return nil
 }
 
 func parseTask(record []string) (*models.Task, error) {
-	if len(record) > 6 {
+	if len(record) != reflect.TypeOf(models.Task{}).NumField() {
 		return nil, fmt.Errorf("invalid record: [%v]", record)
 	}
 
