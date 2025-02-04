@@ -14,6 +14,7 @@ func ViewTaskPage(w http.ResponseWriter, r *http.Request) {
 	renderer.RenderTemplate(w, p, nil)
 }
 
+//todo: get task by id from db and display it's detail
 func ViewTaskDetail(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
@@ -22,6 +23,7 @@ func ViewTaskDetail(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//dummy task, todo: switch for something like db.GetTask()
+
 	t := models.GetTask(uint64(id))
 	pd := &renderer.PageData{
 		Title: fmt.Sprintf("task %v", t.ID),
@@ -33,6 +35,7 @@ func ViewTaskDetail(w http.ResponseWriter, r *http.Request) {
 	renderer.RenderTemplate(w, "task/detail", pd)
 }
 
+//todo: save task to db
 func CreateTask(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
 		w.WriteHeader(http.StatusConflict)
