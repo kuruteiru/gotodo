@@ -9,9 +9,9 @@ type User struct {
 
 func NewUser(id uint64, username, email, password string) User {
     return User{
-        ID:       id
-        Username: username
-        Email:    email
-        Password: password
+        ID:       id,
+        Username: username,
+        Email:    email,
+        Password: password,
     }
 }
