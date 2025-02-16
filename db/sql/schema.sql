@@ -1,3 +1,5 @@
+PRAGMA foreign_keys = ON;
+
 CREATE TABLE IF NOT EXISTS tasks (
 	id INTEGER PRIMARY KEY,
 	name TEXT NOT NULL,
