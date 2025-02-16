@@ -11,56 +11,21 @@ import (
 )
 
 const (
-	dsn           = "db/gotodo.db"
-	createDBQuery = "createdb"
+	dsn       = "db/gotodo.db"
+	sqlDir	  = "sql"
+)
+
+type SqlFile string
+
+const (
+	schemaSqlFile SqlFile = sqlDir+"/schema.sql"
 )
 
 var (
-	//go:embed queries/*.sql
-	queries embed.FS
-	db      *sql.DB
+	//go:embed sql/*.sql
+	sqlFiles embed.FS
+	db       *sql.DB
 )
-
-func Main() {
-	if db == nil {
-		if err := openDB(); err != nil {
-			fmt.Printf("failed opening db: [%v]\n", err.Error())
-			return
-		}
-	}
-	defer db.Close()
-
-	if err := db.Ping(); err != nil {
-		fmt.Printf("database is not alive: %v\n", err)
-	}
-
-	if err := createDB(); err != nil {
-		fmt.Printf("failed creating db: [%v]\n", err)
-	}
-
-	var query string
-	// task := models.NewTask("task1", "desc1", models.TaskPriorityLow)
-	// query = "INSERT INTO tasks (name, description, priority, created, completed) VALUES ($1, $2, $3, $4, $5)"
-	// if _, err := db.Exec(query, task.Name, task.Description, uint8(task.Priority), task.Created, task.Completed); err != nil {
-	// 	fmt.Printf("query failed: %v\n", err)
-	// }
-
-	query = "SELECT * FROM tasks"
-	rows, err := db.Query(query)
-	if err != nil {
-		fmt.Printf("failed selecting rows from tasks: %v\n", err)
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var t models.Task
-		if err := rows.Scan(&t.ID, &t.Name, &t.Description, &t.Priority, &t.Created, &t.Completed); err != nil {
-			fmt.Printf("failed scanning rows %v", rows.Err().Error())
-			break
-		}
-		fmt.Printf("%+v\n", t)
-	}
-}
 
 func openDB() error {
 	var err error
@@ -71,15 +36,7 @@ func openDB() error {
 	return nil
 }
 
-func getQuery(name string) (string, error) {
-	query, err := queries.ReadFile(fmt.Sprintf("queries/%s.sql", name))
-	if err != nil {
-		return "", fmt.Errorf("failed reading query: [%w]", err)
-	}
-	return string(query), nil
-}
-
-func createDB() error {
+func loadSchema() error {
 	if db == nil {
 		if err := openDB(); err != nil {
 			return err
@@ -87,17 +44,25 @@ func createDB() error {
 	}
 
 	if err := db.Ping(); err != nil {
-		fmt.Printf("database is not alive: %v\n", err)
+		return fmt.Errorf("database is not alive: [%w]", err)
 	}
 
-	query, err := getQuery(createDBQuery)
+	query, err := getQuery(schemaSqlFile)
 	if err != nil {
 		return err
 	}
 
 	if _, err := db.Exec(query); err != nil {
-		return err
+		return fmt.Errorf("failed executing %v: [%w]", schemaSqlFile, err)
 	}
 
 	return nil
+}
+
+func getQuery(name SqlFile) (string, error) {
+	query, err := sqlFiles.ReadFile(string(name))
+	if err != nil {
+		return "", fmt.Errorf("failed reading query %s: [%w]", name, err)
+	}
+	return string(query), nil
 }
