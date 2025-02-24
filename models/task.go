@@ -1,9 +1,9 @@
 package models
 
 import (
-	// "fmt"
 	// "os"
 	// "text/tabwriter"
+	"fmt"
 	"time"
 )
 
@@ -53,26 +53,26 @@ func (t *Task) Complete() {
 	t.Completed = &now
 }
 
-// func GetTask(id uint64) *Task {
-// 	t := &GenerateTasks(1)[0]
-// 	t.ID = id
-// 	return t
-// }
-//
-// func GenerateTasks(count int) []Task {
-// 	tasks := []Task{}
-// 	for i := range count {
-// 		tasks = append(tasks, Task{
-// 			ID:          uint64(i),
-// 			Name:        fmt.Sprintf("task %v", uint(i)),
-// 			Description: fmt.Sprintf("task desc %v", uint(i)),
-// 			Created:     time.Now().UTC(),
-// 			Priority:    TaskPriorityNone,
-// 		})
-// 	}
-// 	return tasks
-// }
-//
+func GenerateTasks(count int) []Task {
+	tasks := []Task{}
+	for i := range count {
+		tasks = append(tasks, Task{
+			ID:          uint64(i),
+			Name:        fmt.Sprintf("task %v", uint(i)),
+			Description: fmt.Sprintf("task desc %v", uint(i)),
+			Created:     time.Now().UTC(),
+			Priority:    TaskPriorityNone,
+		})
+	}
+	return tasks
+}
+
+func GetTask(id uint64) *Task {
+	t := &GenerateTasks(1)[0]
+	t.ID = id
+	return t
+}
+
 // func PrintTasks(tasks []Task) {
 // 	for i, task := range tasks {
 // 		fmt.Printf("%v: %+v\n", i, task)

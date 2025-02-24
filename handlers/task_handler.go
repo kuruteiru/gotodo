@@ -23,8 +23,8 @@ func ViewTaskDetail(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//dummy task, todo: switch for something like db.GetTask()
-
 	t := models.GetTask(uint64(id))
+
 	pd := &renderer.PageData{
 		Title: fmt.Sprintf("task %v", t.ID),
 		Data: map[string]models.Task{
@@ -55,7 +55,7 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
 	priority = models.TaskPriority(uint8(ps))
 	fmt.Printf("given tp: %v\n", priority)
 
-	t := models.NewTask(name, description, priority)
+	t := models.NewTask(name, description, priority, 0)
 	
 	//upload task to db
 	//todo: implement permanent storage for tasks
