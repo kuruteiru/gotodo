@@ -5,13 +5,11 @@ import (
 	"embed"
 	"fmt"
 
-	"github.com/kuruteiru/gotodo/models"
-
 	_ "modernc.org/sqlite"
 )
 
 const (
-	dsn       = "db/gotodo.db"
+	dsn       = "db/database.db"
 	sqlDir	  = "sql"
 )
 
