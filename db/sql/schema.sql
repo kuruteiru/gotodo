@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS task (
 	description TEXT,
 	priority INTEGER NOT NULL DEFAULT 0,
 	created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	completed DATETIME
---	todolist_id INTEGER NOT NULL,
---	FOREIGN KEY (todolist_id) REFERENCES todolist(id) ON DELETE CASCADE
+	completed DATETIME,
+	todolist_id INTEGER NOT NULL,
+	FOREIGN KEY (todolist_id) REFERENCES todolist(id) ON DELETE CASCADE
 );
