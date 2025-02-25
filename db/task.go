@@ -1,6 +1,7 @@
 package db
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"strings"
@@ -12,40 +13,67 @@ func SelectTask(id uint64) (*models.Task, error) {
 	query := "SELECT * FROM task WHERE id = ?"
 
 	task := models.Task{}
-	if err := db.QueryRow(query, id).Scan(&task.ID, &task.Name, &task.Description, &task.Priority, &task.Created, &task.Completed); err != nil {
+	if err := db.QueryRow(query, id).Scan(&task.ID, &task.Name, &task.Description, &task.Priority, &task.Created, &task.Completed, &task.TodolistID); err != nil {
 		return nil, fmt.Errorf("failed selecting task with id %v: [%w]", id, err)
 	}
 
 	return &task, nil
 }
 
-func InsertTask(task models.Task) (uint64, error) {
-	query := `INSERT INTO 
-	task (name, description, priority, created, completed)
-	VALUES ($1, $2, $3, $4, $5)`
+func SelectTasks() ([]models.Task, error) {
+	query := "SELECT * FROM task"
 
-	res, err := db.Exec(query, task.Name, task.Description, task.Priority, task.Created, task.Completed)
+	rows, err := db.Query(query)
 	if err != nil {
-		return 0, fmt.Errorf("failed inserting task %+v: [%w]", task, err)
+		return nil, fmt.Errorf("failed selecting tasks: [%w]", err)
+	}
+	defer rows.Close()
+
+	tasks := []models.Task{}
+	var scanningErrs []error
+	for rows.Next() {
+		var task models.Task
+		if err := rows.Scan(&task.ID, &task.Name, &task.Description, &task.Priority, &task.Created, &task.Completed, &task.TodolistID); err != nil {
+			scanningErrs = append(scanningErrs, fmt.Errorf("failed scanning row [%v]", err))
+			continue
+		}
+		tasks = append(tasks, task)
+	}
+
+	if scanningErrs != nil {
+		return tasks, errors.Join(scanningErrs...)
+	}
+
+	return tasks, nil
+}
+
+func InsertTask(task *models.Task) error {
+	query := `INSERT INTO 
+	task (name, description, priority, created, completed, todolist_id)
+	VALUES ($1, $2, $3, $4, $5, $6)`
+
+	res, err := db.Exec(query, task.Name, task.Description, task.Priority, task.Created, task.Completed, task.TodolistID)
+	if err != nil {
+		return fmt.Errorf("failed inserting task %+v: [%w]", task, err)
 	}
 
 	ra, err := res.RowsAffected()
 	if err != nil {
-		return 0, fmt.Errorf("failed getting affected rows: [%w]", err)
+		return fmt.Errorf("failed getting affected rows: [%w]", err)
 	}
 	if ra != 1 {
-		return 0, fmt.Errorf("wrong number of rows affected: %v", ra)
+		return fmt.Errorf("wrong number of rows affected: %v", ra)
 	}
 
 	id, err := res.LastInsertId()
 	if err != nil {
-		return 0, fmt.Errorf("failed getting last inserted id: [%w]", err)
+		return fmt.Errorf("failed getting last inserted id: [%w]", err)
 	}
 
-	return uint64(id), nil
+	task.ID = uint64(id)
+	return nil
 }
 
-//todo: test
 func DeleteTask(id uint64) error {
 	query := "DELETE FROM task WHERE id = ?"
 
@@ -65,7 +93,7 @@ func DeleteTask(id uint64) error {
 	return nil
 }
 
-//todo: test
+//todo: fix/remove reflection, test
 func UpdateTask(task models.Task) error {
 	buff := "UPDATE task SET "
 
@@ -77,7 +105,7 @@ func UpdateTask(task models.Task) error {
 	current, err := SelectTask(task.ID)
 	if err != nil || task.ID == 0 {
 		var err error
-		if task.ID, err = InsertTask(task); err != nil {
+		if err = InsertTask(&task); err != nil {
 			return fmt.Errorf("failed inserting a nonexistant task that should have been updated: [%w]", err)
 		}
 		return nil
