@@ -10,6 +10,10 @@ import (
 )
 
 func SelectTask(id uint64) (*models.Task, error) {
+	if err := checkDB(); err != nil {
+		return nil, fmt.Errorf("cannot select task: [%w]", err)
+	}
+
 	query := "SELECT * FROM task WHERE id = ?"
 
 	task := models.Task{}
@@ -21,6 +25,10 @@ func SelectTask(id uint64) (*models.Task, error) {
 }
 
 func SelectTasks() ([]models.Task, error) {
+	if err := checkDB(); err != nil {
+		return nil, fmt.Errorf("cannot select tasks: [%w]", err)
+	}
+
 	query := "SELECT * FROM task"
 
 	rows, err := db.Query(query)
@@ -48,6 +56,10 @@ func SelectTasks() ([]models.Task, error) {
 }
 
 func InsertTask(task *models.Task) error {
+	if err := checkDB(); err != nil {
+		return fmt.Errorf("cannot insert task: [%w]", err)
+	}
+
 	query := `INSERT INTO 
 	task (name, description, priority, created, completed, todolist_id)
 	VALUES ($1, $2, $3, $4, $5, $6)`
@@ -75,6 +87,10 @@ func InsertTask(task *models.Task) error {
 }
 
 func DeleteTask(id uint64) error {
+	if err := checkDB(); err != nil {
+		return fmt.Errorf("cannot delete task: [%w]", err)
+	}
+	
 	query := "DELETE FROM task WHERE id = ?"
 
 	res, err := db.Exec(query, id)
@@ -95,6 +111,10 @@ func DeleteTask(id uint64) error {
 
 //todo: fix/remove reflection, test
 func UpdateTask(task models.Task) error {
+	if err := checkDB(); err != nil {
+		return fmt.Errorf("cannot delete task: [%w]", err)
+	}
+	
 	buff := "UPDATE task SET "
 
 	var sb strings.Builder
@@ -113,7 +133,13 @@ func UpdateTask(task models.Task) error {
 
 	currentValue := reflect.ValueOf(current)
 	taskValue := reflect.ValueOf(task)
-	t := reflect.TypeOf(current)
+	if currentValue.Kind() == reflect.Ptr {
+		currentValue = currentValue.Elem()
+	}
+	if taskValue.Kind() == reflect.Ptr {
+		taskValue = taskValue.Elem()
+	}
+	t := reflect.TypeOf(task)
 
 	var diff []any
 	for i := range t.NumField() {
@@ -121,7 +147,7 @@ func UpdateTask(task models.Task) error {
 		cf := currentValue.FieldByName(field)
 		tf := taskValue.FieldByName(field)
 
-		if cf == tf {
+		if reflect.DeepEqual(cf.Interface(), tf.Interface()) {
 			continue
 		}
 
@@ -137,12 +163,17 @@ func UpdateTask(task models.Task) error {
 			return fmt.Errorf("failed writing part of query (%v) to string builder (%v): [%w]", buff, sb.String(), err)
 		}
 
-		diff = append(diff, tf)
+		diff = append(diff, tf.Interface())
 	}
 
 	sb.WriteString(" WHERE id = ?")
+	diff = append(diff, task.ID)
 
-	res, err := db.Exec(sb.String(), diff, task.ID)
+	fmt.Printf("diff: %v\n", diff)
+
+	fmt.Printf("query: %v\n", sb.String())
+
+	res, err := db.Exec(sb.String(), diff...)
 	if err != nil {
 		return fmt.Errorf("failed modifying task with id %v: [%w]", task.ID, err)
 	}
